@@ -1,0 +1,5 @@
+Metadata-Version: 2.4
+Name: dsq5-data-wrangling
+Version: 0.0.1
+Summary: Quarter 5 – Data Wrangling (self-contained utilities)
+Requires-Python: >=3.10

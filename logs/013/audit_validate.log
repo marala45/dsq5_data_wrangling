@@ -1,0 +1,4 @@
+{"ts": "2025-08-31 04:51:14", "level": "INFO", "logger": "audit.validate", "msg": "validated", "project": "013_dataset_audit_tool", "file": "projects/013_dataset_audit_tool/data/013/input/sample_expenses.csv", "rows": 10}
+{"ts": "2025-08-31 04:51:14", "level": "INFO", "logger": "audit.validate", "msg": "validation_ok", "project": "013_dataset_audit_tool", "count": 1}
+{"ts": "2025-08-31 05:01:30", "level": "INFO", "logger": "audit.validate", "msg": "validated", "project": "013_dataset_audit_tool", "file": "projects/013_dataset_audit_tool/data/013/input/sample_expenses.csv", "rows": 10}
+{"ts": "2025-08-31 05:01:30", "level": "INFO", "logger": "audit.validate", "msg": "validation_ok", "project": "013_dataset_audit_tool", "count": 1}
