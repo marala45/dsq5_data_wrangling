@@ -1,54 +1,21 @@
-# projects/013_dataset_audit_tool/scripts/013_dataset_audit_tool/step01_scaffold.py
+"""
+Project 013 – Step 01: Scaffold config + output folders.
+
+Usage:
+    python scripts/013_dataset_audit_tool/step01_scaffold.py
+    python scripts/013_dataset_audit_tool/step01_scaffold.py --config /full/path/013_audit.yaml
+"""
 from __future__ import annotations
-
-import argparse
 from pathlib import Path
-import sys
-import yaml
+import argparse, sys, yaml
 
-from pathlib import Path
+# Q5 root (…/dsq5_data_wrangling)
+Q5_ROOT = Path(__file__).resolve().parents[2]
+CFG_DEFAULT = Q5_ROOT / "configs/013_audit.yaml"
 
-THIS_DIR = Path(__file__).resolve().parent
-# scripts/013_dataset_audit_tool/ -> parent
-# scripts/ -> parents[1]
-# <repo root: dsq5_data_wrangling> -> parents[2]
-ROOT = THIS_DIR.parents[2]
+# logging utilities from local toolkit
+from python_toolkit.logger import get_json_logger, CTX, CtxAdapter
 
-def default_cfg_path() -> Path:
-    return ROOT / "configs/013_audit.yaml"
-
-def ensure_dir(p: Path) -> Path:
-    p.mkdir(parents=True, exist_ok=True)
-    return p
-
-# Optional: use shared logger if available; otherwise fallback
-try:
-    from python_toolkit.logger import get_json_logger, CTX, CtxAdapter  # type: ignore
-    _HAS_TOOLKIT = True
-except Exception:
-    _HAS_TOOLKIT = False
-    CTX = None  # type: ignore
-    import logging
-
-    class CtxAdapter(logging.LoggerAdapter):  # type: ignore
-        def process(self, msg, kwargs):
-            return msg, kwargs
-
-    def get_json_logger(name: str = "app", log_filename: str = "audit.log", base_dir: str = "logs/013"):
-        logger = logging.getLogger(name)
-        if not logger.handlers:
-            logger.setLevel(logging.INFO)
-            h = logging.StreamHandler()
-            h.setFormatter(logging.Formatter("[%(asctime)s] %(levelname)s | %(name)s | %(message)s"))
-            logger.addHandler(h)
-            logger.propagate = False
-        return logger
-
-
-# ---------- paths & config ----------
-THIS_DIR = Path(__file__).resolve().parent                # .../scripts/013_dataset_audit_tool
-PROJECT_DIR = THIS_DIR.parents[2]                         # .../projects/013_dataset_audit_tool
-CFG_DEFAULT = PROJECT_DIR / "configs/013_audit.yaml"      # default config
 
 def load_yaml(p: Path) -> dict:
     with p.open("r", encoding="utf-8") as f:
@@ -56,13 +23,11 @@ def load_yaml(p: Path) -> dict:
 
 
 def parse_args() -> argparse.Namespace:
-    ap = argparse.ArgumentParser(description="Step 01: scaffold folders for dataset audit tool.")
-    ap.add_argument("--config", type=str, default=str(CFG_DEFAULT),
-                    help=f"Path to YAML config (default: {CFG_DEFAULT})")
+    ap = argparse.ArgumentParser(description="Step 01 – scaffold folders for the audit tool.")
+    ap.add_argument("--config", type=str, default=str(CFG_DEFAULT), help="Path to YAML config.")
     return ap.parse_args()
 
 
-# ---------- main ----------
 def main() -> int:
     args = parse_args()
     cfg_path = Path(args.config)
@@ -73,27 +38,26 @@ def main() -> int:
         return 2
 
     cfg = load_yaml(cfg_path)
+    CTX.set({"project": "013_dataset_audit_tool"})
+    log = CtxAdapter(
+        get_json_logger("audit.scaffold", log_filename="audit.log", base_dir=cfg.get("log_dir", "logs/013")),
+        {},
+    )
+    log.info("scaffold_start", extra={"cfg_path": str(cfg_path)})
 
-    log_dir = cfg.get("log_dir", "logs/013")
-    base_log = get_json_logger("audit.scaffold", log_filename="audit.log", base_dir=log_dir)
-    log = CtxAdapter(base_log, {})
+    # Create output folders
+    Path(cfg.get("report_dir", "reports/013")).mkdir(parents=True, exist_ok=True)
+    Path(cfg.get("results_dir", "results/013")).mkdir(parents=True, exist_ok=True)
+    Path(cfg.get("log_dir", "logs/013")).mkdir(parents=True, exist_ok=True)
 
-    if _HAS_TOOLKIT and CTX is not None:
-        CTX.set({"project": "013_dataset_audit_tool"})
-
-    # Validate minimal keys (not strictly required here but helpful)
-    report_dir = Path(cfg.get("report_dir", "reports/013"))
-    results_dir = Path(cfg.get("results_dir", "results/013"))
-    report_dir.mkdir(parents=True, exist_ok=True)
-    results_dir.mkdir(parents=True, exist_ok=True)
-    Path(log_dir).mkdir(parents=True, exist_ok=True)
-
-    log.info("scaffold_ok", extra={
-        "cfg": str(cfg_path),
-        "report_dir": str(report_dir),
-        "results_dir": str(results_dir),
-        "log_dir": str(log_dir),
-    })
+    log.info(
+        "scaffold_ok",
+        extra={
+            "report_dir": cfg.get("report_dir", "reports/013"),
+            "results_dir": cfg.get("results_dir", "results/013"),
+            "log_dir": cfg.get("log_dir", "logs/013"),
+        },
+    )
     return 0
 
 

@@ -1,3 +1,4 @@
+README.md
 pyproject.toml
 src/dsq5_data_wrangling.egg-info/PKG-INFO
 src/dsq5_data_wrangling.egg-info/SOURCES.txt
@@ -5,3 +6,4 @@ src/dsq5_data_wrangling.egg-info/dependency_links.txt
 src/dsq5_data_wrangling.egg-info/top_level.txt
 src/python_toolkit/__init__.py
 src/python_toolkit/logger.py
+tests/test_013_dataset_audit.py

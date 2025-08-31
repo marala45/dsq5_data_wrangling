@@ -1,0 +1,7 @@
+def main() -> int:
+    cfg = str(CFG_DEFAULT)  # absolute path
+    py = sys.executable
+    base = Q5_ROOT / "scripts/013_dataset_audit_tool"
+    print("Q5_ROOT:", Q5_ROOT)
+    print("base:", base)
+    # ...existing code...
